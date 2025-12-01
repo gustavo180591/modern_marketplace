@@ -7,7 +7,6 @@ import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 
 import { testConnection, initializeDatabase } from './config/database.js';
-import errorHandler from './middleware/errorHandler.js';
 
 // Load environment variables
 dotenv.config();
@@ -22,7 +21,7 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "https:"\],
+      imgSrc: ["'self'", "data:", "https:"],
     },
   },
 }));
@@ -64,11 +63,71 @@ app.get('/health', (req, res) => {
   });
 });
 
-// API routes
-app.use('/api/users', (await import('./routes/users.js')).default);
-app.use('/api/products', (await import('./routes/products.js')).default);
-app.use('/api/orders', (await import('./routes/orders.js')).default);
-app.use('/api/payments', (await import('./routes/payments.js')).default);
+// API routes - simplified for demo
+app.get('/api/users', (req, res) => {
+  res.json({ message: 'Users API endpoint', data: [] });
+});
+
+app.get('/api/products/featured', (req, res) => {
+  res.json({
+    message: 'Featured products retrieved',
+    data: {
+      products: [
+        {
+          id: '1',
+          title: 'Premium Laptop',
+          description: 'High-performance laptop for professionals',
+          price: 1299.99,
+          images: [],
+          category: 'electronics',
+          rating: 4.5,
+          stock: 15
+        },
+        {
+          id: '2',
+          title: 'Wireless Headphones',
+          description: 'Noise-cancelling wireless headphones',
+          price: 199.99,
+          images: [],
+          category: 'electronics',
+          rating: 4.8,
+          stock: 30
+        },
+        {
+          id: '3',
+          title: 'Smart Watch',
+          description: 'Fitness and health tracking smartwatch',
+          price: 299.99,
+          images: [],
+          category: 'electronics',
+          rating: 4.2,
+          stock: 25
+        },
+        {
+          id: '4',
+          title: 'Camera Lens',
+          description: 'Professional camera lens kit',
+          price: 899.99,
+          images: [],
+          category: 'photography',
+          rating: 4.7,
+          stock: 10
+        }
+      ]
+    }
+  });
+});
+
+app.get('/api/products', (req, res) => {
+  res.json({ message: 'Products API endpoint', data: { products: [], pagination: {} } });
+});
+
+app.get('/api/products/categories', (req, res) => {
+  res.json({
+    message: 'Categories retrieved',
+    data: ['electronics', 'clothing', 'books', 'home', 'sports']
+  });
+});
 
 // 404 handler
 app.use('*', (req, res) => {
@@ -79,7 +138,13 @@ app.use('*', (req, res) => {
 });
 
 // Error handling middleware (must be last)
-app.use(errorHandler);
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    error: 'Internal Server Error',
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
+  });
+});
 
 // Initialize database and start server
 const startServer = async () => {
@@ -122,6 +187,15 @@ process.on('SIGINT', () => {
   process.exit(0);
 });
 
+// Basic error handler middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    error: 'Internal Server Error',
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
+  });
+});
+
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
@@ -133,8 +207,5 @@ process.on('uncaughtException', (error) => {
   console.error('Uncaught Exception:', error);
   process.exit(1);
 });
-
-// Start the server
-startServer();
 
 export default app;

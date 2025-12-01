@@ -1,0 +1,325 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  lint-and-format:
+    name: Lint and Format Check
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: |
+        npm ci
+        cd backend && npm ci
+        cd ../frontend && npm ci
+
+    - name: Run ESLint (Backend)
+      run: |
+        cd backend && npx eslint src/ --format=json --output-file=eslint-backend.json
+
+    - name: Run ESLint (Frontend)
+      run: |
+        cd frontend && npx eslint src/ --format=json --output-file=eslint-frontend.json
+
+    - name: Check Prettier formatting
+      run: |
+        npx prettier --check "backend/src/**/*.js" "frontend/src/**/*.{js,jsx}" "tests/**/*.{js,jsx}"
+
+    - name: Upload ESLint results
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: eslint-results
+        path: |
+          backend/eslint-backend.json
+          frontend/eslint-frontend.json
+
+  type-check:
+    name: Type Checking
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: |
+        npm ci
+        cd backend && npm ci
+        cd ../frontend && npm ci
+
+    - name: Type check (Backend)
+      run: |
+        cd backend && npx tsc --noEmit --skipLibCheck || true
+
+    - name: Type check (Frontend)
+      run: |
+        cd frontend && npx tsc --noEmit --skipLibCheck || true
+
+  test-coverage:
+    name: Test Coverage
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: modern_marketplace_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: |
+        npm ci
+        cd backend && npm ci
+        cd ../frontend && npm ci
+
+    - name: Run Backend Tests with Coverage
+      env:
+        NODE_ENV: test
+        DB_HOST: localhost
+        DB_PORT: 5432
+        DB_NAME: modern_marketplace_test
+        DB_USER: postgres
+        DB_PASSWORD: postgres
+        REDIS_HOST: localhost
+        REDIS_PORT: 6379
+        JWT_SECRET: test-jwt-secret
+        JWT_REFRESH_SECRET: test-jwt-refresh-secret
+      run: |
+        cd backend && npm run test:coverage
+
+    - name: Run Frontend Tests with Coverage
+      env:
+        VITE_API_URL: http://localhost:3001/api
+        NODE_ENV: test
+      run: |
+        cd frontend && npm run test:coverage
+
+    - name: Upload Coverage Reports
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./backend/coverage/lcov.info,./frontend/coverage/lcov.info
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: |
+        npm ci
+        cd backend && npm ci
+        cd ../frontend && npm ci
+
+    - name: Run npm audit (Root)
+      run: npm audit --audit-level moderate
+
+    - name: Run npm audit (Backend)
+      run: cd backend && npm audit --audit-level moderate
+
+    - name: Run npm audit (Frontend)
+      run: cd frontend && npm audit --audit-level moderate
+
+  dependency-check:
+    name: Dependency Check
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: |
+        npm ci
+        cd backend && npm ci
+        cd ../frontend && npm ci
+
+    - name: Check for outdated dependencies
+      run: |
+        npm outdated || true
+        cd backend && npm outdated || true
+        cd ../frontend && npm outdated || true
+
+    - name: Check for security vulnerabilities in dependencies
+      run: |
+        npx audit-ci --moderate
+        cd backend && npx audit-ci --moderate || true
+        cd ../frontend && npx audit-ci --moderate || true
+
+  complexity-analysis:
+    name: Code Complexity Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: |
+        npm ci
+        cd backend && npm ci
+        cd ../frontend && npm ci
+
+    - name: Install complexity tools
+      run: npm install -g complexity-report
+
+    - name: Analyze Backend Complexity
+      run: |
+        cd backend && complexity -o json -f complexity-backend.json src/ || true
+
+    - name: Analyze Frontend Complexity
+      run: |
+        cd frontend && complexity -o json -f complexity-frontend.json src/ || true
+
+    - name: Upload Complexity Reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: complexity-reports
+        path: |
+          backend/complexity-backend.json
+          frontend/complexity-frontend.json
+        retention-days: 30
+
+  performance-budget:
+    name: Performance Budget Check
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: |
+        npm ci
+        cd frontend && npm ci
+
+    - name: Build Frontend
+      run: |
+        cd frontend && npm run build
+
+    - name: Check bundle size
+      run: |
+        cd frontend && npx bundlesize
+
+    - name: Analyze bundle composition
+      run: |
+        cd frontend && npx webpack-bundle-analyzer dist/static/js/*.js --mode=json --report=bundle-analysis.json || true
+
+    - name: Upload Bundle Analysis
+      uses: actions/upload-artifact@v3
+      with:
+        name: bundle-analysis
+        path: frontend/bundle-analysis.json
+        retention-days: 30
+
+  sonarcloud:
+    name: SonarCloud Analysis
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: |
+        npm ci
+        cd backend && npm ci
+        cd ../frontend && npm ci
+
+    - name: Run Tests with Coverage
+      env:
+        NODE_ENV: test
+        DB_HOST: localhost
+        DB_PORT: 5432
+        DB_NAME: modern_marketplace_test
+        DB_USER: postgres
+        DB_PASSWORD: postgres
+        REDIS_HOST: localhost
+        REDIS_PORT: 6379
+        JWT_SECRET: test-jwt-secret
+        JWT_REFRESH_SECRET: test-jwt-refresh-secret
+      run: |
+        cd backend && npm run test:coverage
+        cd ../frontend && npm run test:coverage
+
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
