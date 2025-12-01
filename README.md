@@ -1,64 +1,99 @@
 # Modern Marketplace
 
-## Overview
-A modern, scalable marketplace platform inspired by Mercado Libre. This project provides a full‑stack solution for buying and selling products online, featuring user authentication, product listings, shopping cart, checkout, reviews, and more.
+## Visión General
+Plataforma moderna y escalable de comercio electrónico inspirada en Mercado Libre. Este proyecto ofrece una solución completa para comprar y vender productos en línea, con autenticación de usuarios, listados de productos, carrito de compras, checkout, reseñas y más.
 
-## Features
-- User registration, login, and profile management
-- Product creation, browsing, searching, and categorization
-- Shopping cart with persistent sessions
-- Secure checkout with Stripe/Mercado Pago integration
-- Seller and buyer ratings & reviews
-- Real‑time notifications via WebSockets
-- Responsive UI with dark/light themes
-- Docker‑based development environment
+## Características Principales
+- **Gestión de Usuarios**: Registro, autenticación y perfiles personalizados
+- **Catálogo de Productos**: Búsqueda avanzada, filtros y categorías
+- **Carrito de Compras**: Persistente con sincronización en tiempo real
+- **Checkout Seguro**: Integración con múltiples pasarelas de pago
+- **Sistema de Reseñas**: Valoraciones de productos y vendedores
+- **Notificaciones en Tiempo Real**: Usando WebSockets
+- **Diseño Adaptativo**: Compatible con móviles y escritorio
+- **Temas Claros/Oscuros**: Personalización de la interfaz
 
-## Technology Stack
-- **Frontend**: React (Vite), vanilla CSS with CSS variables, React Context/Redux Toolkit
-- **Backend**: Node.js (v20) with Express
-- **Database**: PostgreSQL
-- **Cache & Messaging**: Redis
-- **File Storage**: Amazon S3 (or MinIO locally)
-- **Payments**: Stripe (or Mercado Pago)
-- **Containerisation**: Docker & Docker Compose (Kubernetes future)
+## Tecnologías Clave
+- **Frontend**: React 18, Vite, TailwindCSS
+- **Backend**: Node.js 20+, Express
+- **Base de Datos**: PostgreSQL
+- **Caché**: Redis
+- **Almacenamiento**: Amazon S3 / MinIO
+- **Pagos**: Stripe, Mercado Pago
+- **Contenedores**: Docker, Docker Compose
 - **CI/CD**: GitHub Actions
-- **Testing**: Jest, React Testing Library, SuperTest, Cypress
+- **Pruebas**: Jest, React Testing Library, Cypress
 
-## Documentation
-All project documentation lives in the `docs/` directory:
-- `01_user_story.md` – High‑level requirements
-- `stack.md` – Detailed tech stack
-- `architecture.md` – System architecture overview
-- `api_spec.md` – OpenAPI specification
-- `database_schema.md` – Database model description
-- `ui_ux_guidelines.md` – Design system and UI guidelines
-- `deployment.md` – How to run locally and deploy
-- `testing_strategy.md` – Testing approach
-- `roadmap.md` – Project milestones
-- `contributing.md` – How to contribute
-- `changelog.md` – Change history
-- `faq.md` – Frequently asked questions
+## Estructura del Proyecto
+```
+modern-marketplace/
+├── client/                # Aplicación frontend
+├── server/                # API y lógica del servidor
+├── docs/                  # Documentación
+│   ├── api/              # Documentación de la API
+│   ├── architecture/      # Decisiones de arquitectura
+│   ├── core/             # Documentación del núcleo
+│   ├── design/           # Guías de diseño
+│   ├── features/         # Características detalladas
+│   ├── guides/           # Guías prácticas
+│   └── metrics/          # Métricas y rendimiento
+├── scripts/              # Scripts de utilidad
+└── docker/               # Configuración de Docker
+```
 
-## Getting Started
+## Documentación Completa
+
+### Guías Esenciales
+- [Guía de Inicio Rápido](/docs/guides/development.md)
+- [Despliegue en Producción](/docs/guides/deployment.md)
+- [Estructura del Código](/docs/core/overview.md)
+- [Guía de Contribución](/CONTRIBUTING.md)
+
+### Características Detalladas
+- [Sistema de Recomendaciones](/docs/features/recommendations.md)
+- [Mensajería Interna](/docs/features/messaging.md)
+- [Gestión de Envíos](/docs/features/shipping.md)
+- [Programa de Fidelización](/docs/features/loyalty.md)
+- [Soporte Multi-idioma](/docs/features/multilanguage.md)
+
+### Referencia Técnica
+- [API REST](/docs/api/rest.md)
+- [Esquema de Base de Datos](/docs/core/database.md)
+- [Arquitectura del Sistema](/docs/core/architecture.md)
+- [Pautas de UI/UX](/docs/design/ui_ux_guidelines.md)
+
+## Empezando
+
+### Requisitos Previos
+- Node.js 20+
+- PostgreSQL 14+
+- Redis 6+
+- Docker (opcional)
+
+### Instalación
 ```bash
-# Clone the repo
-git clone https://github.com/gustavo180591/modern_marketplace.git
-cd modern_marketplace
+# Clonar el repositorio
+git clone https://github.com/tu-usuario/modern-marketplace.git
+cd modern-marketplace
 
-# Install dependencies
+# Instalar dependencias
 npm install
 
-# Start services (Docker Compose)
-docker compose up -d
+# Configurar variables de entorno
+cp .env.example .env
 
-# Run the frontend
+# Iniciar servicios
+docker-compose up -d
+
+# Ejecutar migraciones
+npm run db:migrate
+
+# Iniciar servidor de desarrollo
 npm run dev
 ```
-The app will be available at `http://localhost:3000`.
 
-## Contributing
-Please read `docs/contributing.md` for guidelines on how to submit issues, fork the repo, and open pull requests.
+## Soporte
+Para reportar problemas o solicitar características, por favor [crea un issue](https://github.com/tu-usuario/modern-marketplace/issues).
 
-## License
-This project is licensed under the MIT License.
-
+## Licencia
+Este proyecto está bajo la Licencia MIT. Ver [LICENSE](LICENSE) para más información.

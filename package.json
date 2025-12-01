@@ -1,0 +1,25 @@
+{
+  "name": "modern-marketplace",
+  "version": "1.0.0",
+  "description": "A modern marketplace application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "echo \"Starting development server\"",
+    "build": "echo \"Building application\"",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "marketplace",
+    "ecommerce",
+    "modern"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
