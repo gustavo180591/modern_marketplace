@@ -14,53 +14,77 @@ Plataforma moderna y escalable de comercio electrónico inspirada en Mercado Lib
 - **Temas Claros/Oscuros**: Personalización de la interfaz
 
 ## Tecnologías Clave
-- **Frontend**: React 18, Vite, TailwindCSS
-- **Backend**: Node.js 20+, Express
-- **Base de Datos**: PostgreSQL
-- **Caché**: Redis
-- **Almacenamiento**: Amazon S3 / MinIO
-- **Pagos**: Stripe, Mercado Pago
+- **Frontend**: React 18, Vite, CSS Variables, React Router
+- **Backend**: Node.js 20+, Express.js, CORS
+- **Base de Datos**: PostgreSQL (configurado, no requerido para demo)
+- **Caché**: Redis (configurado, no requerido para demo)
+- **Testing**: Jest, React Testing Library, Supertest
 - **Contenedores**: Docker, Docker Compose
-- **CI/CD**: GitHub Actions
-- **Pruebas**: Jest, React Testing Library, Cypress
+- **CI/CD**: GitHub Actions (linting, tests, security)
+- **Build Tools**: ESLint, Prettier, npm workspaces
 
 ## Estructura del Proyecto
 ```
 modern-marketplace/
-├── client/                # Aplicación frontend
-├── server/                # API y lógica del servidor
-├── docs/                  # Documentación
-│   ├── api/              # Documentación de la API
-│   ├── architecture/      # Decisiones de arquitectura
-│   ├── core/             # Documentación del núcleo
-│   ├── design/           # Guías de diseño
-│   ├── features/         # Características detalladas
-│   ├── guides/           # Guías prácticas
-│   └── metrics/          # Métricas y rendimiento
-├── scripts/              # Scripts de utilidad
-└── docker/               # Configuración de Docker
+├── frontend/              # Aplicación React + Vite
+│   ├── src/
+│   │   ├── components/    # Componentes UI (Header, Footer, Layout)
+│   │   ├── pages/         # Páginas (Home, Login, Register, Profile)
+│   │   ├── contexts/      # React Context (Auth, Theme, Products)
+│   │   ├── utils/         # Utilidades (api.js)
+│   │   └── assets/        # Estilos e imágenes
+│   ├── package.json
+│   └── vite.config.js
+├── backend/               # API Express.js
+│   ├── src/
+│   │   ├── app.js         # Configuración del servidor
+│   │   ├── server-simple.js # Servidor simplificado para demo
+│   │   ├── config/        # Configuración de base de datos
+│   │   ├── models/        # Modelos de datos
+│   │   ├── routes/        # Rutas de la API
+│   │   ├── middleware/    # Middleware Express
+│   │   └── utils/         # Utilidades del servidor
+│   └── package.json
+├── tests/                 # Pruebas unitarias e integración
+├── .github/workflows/     # CI/CD con GitHub Actions
+├── docker-compose.yml     # Configuración Docker
+└── package.json           # Workspace raíz
 ```
 
-## Documentación Completa
+## Características Implementadas
 
-### Guías Esenciales
-- [Guía de Inicio Rápido](/docs/guides/development.md)
-- [Despliegue en Producción](/docs/guides/deployment.md)
-- [Estructura del Código](/docs/core/overview.md)
-- [Guía de Contribución](/CONTRIBUTING.md)
+### ✅ Frontend Funcional
+- **Navegación Completa**: React Router con lazy loading y rutas protegidas
+- **Theme Switching**: Sistema de temas claro/oscuro con CSS variables
+- **Diseño Responsivo**: Mobile-first con layouts adaptables
+- **Componentes UI**: Header, Footer, Layout con navegación funcional
+- **Páginas Completas**: Home, Login, Register, Profile, NotFound
+- **Estados de Carga**: Loading spinners y manejo de errores
+- **Context API**: Auth, Theme y Products contexts funcionales
 
-### Características Detalladas
-- [Sistema de Recomendaciones](/docs/features/recommendations.md)
-- [Mensajería Interna](/docs/features/messaging.md)
-- [Gestión de Envíos](/docs/features/shipping.md)
-- [Programa de Fidelización](/docs/features/loyalty.md)
-- [Soporte Multi-idioma](/docs/features/multilanguage.md)
+### ✅ Backend API
+- **Endpoints Funcionales**: `/api/products/featured`, `/api/categories`, `/health`
+- **Datos de Demo**: Productos realistas y categorías predefinidas
+- **CORS Configurado**: Comunicación segura con el frontend
+- **Manejo de Errores**: 404 y 500 responses apropiados
+- **Health Check**: Endpoint para monitoreo del sistema
 
-### Referencia Técnica
-- [API REST](/docs/api/rest.md)
-- [Esquema de Base de Datos](/docs/core/database.md)
-- [Arquitectura del Sistema](/docs/core/architecture.md)
-- [Pautas de UI/UX](/docs/design/ui_ux_guidelines.md)
+### ✅ Desarrollo Profesional
+- **Hot Reload**: Vite para frontend, nodemon para backend
+- **Testing Suite**: Unit tests, integration tests, coverage reports
+- **CI/CD Pipeline**: GitHub Actions con quality gates
+- **Code Quality**: ESLint, Prettier, security scanning
+- **Workspace Setup**: npm workspaces para monorepo
+
+## Demo Rápida
+
+La aplicación está lista para usar inmediatamente:
+
+1. **Frontend**: http://localhost:5173/ - Interfaz completa del marketplace
+2. **Backend**: http://localhost:3001/ - API con datos de demo
+3. **Health Check**: http://localhost:3001/health - Estado del sistema
+
+No requiere configuración de base de datos ni servicios externos para la demo.
 
 ## Empezando
 
@@ -76,20 +100,15 @@ modern-marketplace/
 git clone https://github.com/tu-usuario/modern-marketplace.git
 cd modern-marketplace
 
-# Instalar dependencias
+# Instalar dependencias (workspace completo)
 npm install
 
-# Configurar variables de entorno
-cp .env.example .env
-
-# Iniciar servicios
-docker-compose up -d
-
-# Ejecutar migraciones
-npm run db:migrate
-
-# Iniciar servidor de desarrollo
+# Iniciar ambos servicios (frontend + backend)
 npm run dev
+
+# O iniciar servicios por separado:
+npm run dev:frontend  # http://localhost:5173
+npm run dev:backend   # http://localhost:3001
 ```
 
 ## Soporte
